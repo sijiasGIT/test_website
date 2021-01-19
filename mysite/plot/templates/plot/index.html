@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+/* Style the tab */
+.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+
+/* Style the buttons that are used to open the tab content */
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-top: none;
+}
+</style>
+</head>
+<body>
+<!-- Tab links -->
+<div class="tab">
+  <button class="tablinks" onclick="openTab(event, 'Trend')" id="defaultOpen">Trend</button>
+  <button class="tablinks" onclick="openTab(event, 'Transaction')">Transaction</button>
+</div>
+
+<!-- Tab content -->
+<div id="Trend" class="tabcontent">
+	<form method="post">
+		{% csrf_token %}
+	    <label for="stock">Stock Code: </label>
+	    <input id="stock" type="text" name="stock", value="{{ stock }}" required>
+	    <label for="start_date">Start Date: </label>
+	    <input id="start_date" type="text" name="start_date" value="{{ start_date }}" required>
+	    <label for="end_date">End Date: </label>
+	    <input id="end_date" type="text" name="end_date" value="{{ end_date }}" required>
+	    <input type="submit" name="OK1" value="trend plot">
+	</form>
+
+	{% if shareholder_list %}
+		<input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for names.." title="Type in a name">
+
+	    <table id="myTable">
+		    <tr class="header">
+		        <th>Participant ID</th>
+		        <th>Name of CCASS Participant</th>
+		        <th>Address</th>
+		        <th>Shareholding</th>
+		        <th>% of the total</th>
+		    </tr>
+	    {% for shareholder in shareholder_list %}
+	        <tr> 
+	        	<td>{{ shareholder.pid }}</td>
+	        	<td>{{ shareholder.name }}</td>
+	        	<td>{{ shareholder.address }}</td>
+	        	<td>{{ shareholder.share }}</td>
+	        	<td>{{ shareholder.percent }}</td>
+	    	</tr>
+	    {% endfor %}
+	    </table>
+
+	    <script>
+		function myFunction() {
+		  var input, filter, table, tr, td, i;
+		  input = document.getElementById("myInput");
+		  filter = input.value.toUpperCase();
+		  table = document.getElementById("myTable");
+		  tr = table.getElementsByTagName("tr");
+		  for (i = 0; i < tr.length; i++) {
+		    td = tr[i].getElementsByTagName("td")[1];
+		    if (td) {
+		      if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+		        tr[i].style.display = "";
+		      } else {
+		        tr[i].style.display = "none";
+		      }
+		    }       
+		  }
+		}
+		</script>
+	{% else %}
+	    <p>No plot are available.</p>
+	{% endif %}
+</div>
+
+<div id="Transaction" class="tabcontent">
+	<form method="post">
+		{% csrf_token %}
+	    <label for="stock2">Stock Code: </label>
+	    <input id="stock2" type="text" name="stock2", value="{{ stock2 }}" required>
+	    <label for="start_date2">Start Date: </label>
+	    <input id="start_date2" type="text" name="start_date2" value="{{ start_date2 }}" required>
+	    <label for="end_date2">End Date: </label>
+	    <input id="end_date2" type="text" name="end_date2" value="{{ end_date2 }}" required>
+	    <label for="threshold2">threshold %: </label>
+	    <input id="threshold2" type="text" name="threshold2" value="{{ threshold2 }}" required>
+	    <input type="submit" name="OK2" value="transaction finder">
+	</form>
+
+	{% if participant_list %}
+
+	    <table id="myTable2">
+		    <tr class="header">
+		    	<th>Date
+		    	<th>Participant ID</th>
+		        <th>Participant Name</th>
+		    </tr>
+	    {% for participant in participant_list %}
+	        <tr> 
+	        	<td>{{ participant.date }}</td>
+	        	<td>{{ participant.pid }}</td>
+	        	<td>{{ participant.name }}</td>
+	    	</tr>
+	    {% endfor %}
+	    </table>
+	{% else %}
+	    <p>No plot are available.</p>
+	{% endif %}
+</div>
+</body>
+</html>
+
+<script>
+document.getElementById("defaultOpen").click();
+function openTab(evt, tabName) {
+  // Declare all variables
+  var i, tabcontent, tablinks;
+
+  // Get all elements with class="tabcontent" and hide them
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+
+  // Get all elements with class="tablinks" and remove the class "active"
+  tablinks = document.getElementsByClassName("tablinks");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+
+  // Show the current tab, and add an "active" class to the button that opened the tab
+  document.getElementById(tabName).style.display = "block";
+  evt.currentTarget.className += " active";
+}
+</script>
