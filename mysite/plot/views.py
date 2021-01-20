@@ -1,6 +1,8 @@
 from django.http import HttpResponse
 from django.template import loader
 from datetime import datetime
+from plotly.offline import plot
+from plotly.graph_objs import Bar,Layout
 
 from .models import Shareholder, Participant
 
@@ -22,13 +24,14 @@ def index(request):
 
 	shareholder_list = []
 	participant_list = []
-	start_date = ''
-	end_date = ''
+	start_date = 'YYYY/mm/dd'
+	end_date = 'YYYY/mm/dd'
 	stock = ''
-	start_date2 = ''
-	end_date2 = ''
+	start_date2 = 'YYYY/mm/dd'
+	end_date2 = 'YYYY/mm/dd'
 	stock2 = ''
 	threshold2 = ''
+	plot_div = None
 
 	if request.method == 'POST' and 'OK1' in request.POST:
 		start_date = request.POST['start_date']
@@ -67,8 +70,12 @@ def index(request):
 		for index, row in df.iterrows():
 			q = Shareholder(pid=row['pid'], name=row['name'], address=row['address'], share=row['share'], percent=row['percent'])
 			q.save()
+		shareholder_list = Shareholder.objects.order_by('-share')
+		plot_list = Shareholder.objects.order_by('-share')[:10]
+		x = [i.pid for i in plot_list]
+		y = [i.share for i in plot_list]
+		plot_div = plot({'data':[Bar(x=x, y=y, name='plot')], "layout": Layout(title="Shareholding of the top 10 participant as of the end date", xaxis=dict(title='Participant ID'), yaxis=dict(title='Shareholding'))},output_type='div')
 
-		shareholder_list = Shareholder.objects.order_by('-share')[:10]
 
 	elif request.method == 'POST' and 'OK2' in request.POST:
 		start_date2 = request.POST['start_date2']
@@ -140,6 +147,7 @@ def index(request):
 		'start_date2': start_date2,
 		'end_date2': end_date2,
 		'stock2': stock2,
-		'threshold2': threshold2
+		'threshold2': threshold2,
+                'plot_div': plot_div
 	}
 	return HttpResponse(template.render(context, request))

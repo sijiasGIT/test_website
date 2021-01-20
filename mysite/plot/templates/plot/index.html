@@ -40,6 +40,7 @@
 </style>
 </head>
 <body>
+<h1>CCASS Plotter (within one year)</h1>
 <!-- Tab links -->
 <div class="tab">
   <button class="tablinks" onclick="openTab(event, 'Trend')" id="defaultOpen">Trend</button>
@@ -60,7 +61,10 @@
 	</form>
 
 	{% if shareholder_list %}
-		<input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for names.." title="Type in a name">
+	{% autoescape off %}
+  	{{ plot_div }}
+  	{% endautoescape %}
+	<input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for Participant ID.." title="Type in a name">
 
 	    <table id="myTable">
 		    <tr class="header">
@@ -80,7 +84,6 @@
 	    	</tr>
 	    {% endfor %}
 	    </table>
-
 	    <script>
 		function myFunction() {
 		  var input, filter, table, tr, td, i;
@@ -89,7 +92,7 @@
 		  table = document.getElementById("myTable");
 		  tr = table.getElementsByTagName("tr");
 		  for (i = 0; i < tr.length; i++) {
-		    td = tr[i].getElementsByTagName("td")[1];
+		    td = tr[i].getElementsByTagName("td")[0];
 		    if (td) {
 		      if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
 		        tr[i].style.display = "";
